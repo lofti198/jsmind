@@ -1,0 +1,141 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta charset="utf-8" />
+        <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+        <title>jsMind</title>
+        <link type="text/css" rel="stylesheet" href="../style/jsmind.css" />
+        <style type="text/css">
+            #jsmind_container {
+                width: 800px;
+                height: 500px;
+                border: solid 1px #ccc;
+                /*background:#f4f4f4;*/
+                background: #f4f4f4;
+            }
+        </style>
+    </head>
+    <body>
+        <div id="jsmind_container"></div>
+        
+        <button id="mapToMd">Map to MD</button>
+        <button id="mdToMap">MD to Map</button>
+        <textarea id="text" rows="15" cols="70"></textarea>
+
+        <script type="text/javascript" src="../js/jsmind.js"></script>
+        <script type="text/javascript" src="../js/jsmind.draggable.js"></script>
+        <script type="text/javascript" src="../js/markdownParser.js"></script>
+        <script type="text/javascript">
+            let strMd = 
+            `# 1
+    - MainTopic
+	- Subtopic1
+		- Sub1
+			- Sub11
+			- Sub12
+				- Sub121
+			- Sub13
+		- Sub2
+			- Sub21
+			- Sub22
+	- Subtopic2
+		- Sub3
+			- Sub31
+				- Sub311
+			- Sub32
+`;
+
+            /*`# MainTopic
+## Subtopic1
+- sub1
+	- sub11
+	- sub12
+		- sub121
+	- sub13
+- sub2
+	- sub21
+	- sub22
+## Subtopic2
+- sub3
+	- sub31
+		- sub311
+	- sub32
+`;*/
+
+            let dataFromMd =parse(strMd);
+            // dataFromMd = [
+            //             { id: 'root', isroot: true, topic: 'MainTopic' },
+            //             { id: 'subtopic1', parentid: 'root', topic: 'Subtopic1' },
+            //             { id: 'sub1', parentid: 'subtopic1', topic: 'Sub1' },
+            //             { id: 'sub11', parentid: 'sub1', topic: 'Sub11' },
+            //             { id: 'sub12', parentid: 'sub1', topic: 'Sub12' },
+            //             { id: 'sub121', parentid: 'sub12', topic: 'Sub121' },
+            //             { id: 'sub13', parentid: 'sub1', topic: 'Sub13' },
+            //             { id: 'sub2', parentid: 'subtopic1', topic: 'Sub2' },
+            //             { id: 'sub21', parentid: 'sub2', topic: 'Sub21' },
+            //             { id: 'sub22', parentid: 'sub2', topic: 'Sub22' },
+            //             { id: 'subtopic2', parentid: 'root', topic: 'Subtopic2' },
+            //             { id: 'sub3', parentid: 'subtopic2', topic: 'Sub3' },
+            //         ];
+           
+            
+            console.log(dataFromMd);
+            function load_jsmind(data) {
+                var mind = {
+                    meta: {
+                        name: 'demo',
+                        author: 'hizzgdev@163.com',
+                        version: '0.2',
+                    },
+                    format: 'node_array',
+                    data: data, 
+                };
+                var options = {
+                    container: 'jsmind_container',
+                    editable: true,
+                    theme: 'primary',
+                };
+                var jm = jsMind.show(options, mind);
+                
+                // jm.set_readonly(true);
+                // var mind_data = jm.get_data();
+                // alert(mind_data);
+                // jm.add_node('sub2', 'sub23', 'new node', { 'background-color': 'red' });
+                jm.set_node_color('sub21', 'green', '#ccc');
+                return jm;
+            }
+
+            const jm = load_jsmind(dataFromMd);
+            function convertMapToMd()
+            {
+                let accumulator = "";
+                const logNode = (node, level = 0) => 
+                {
+                    accumulator += `${"	".repeat(level)}- ${node.topic}\r\n`
+                    // console.log(`${"	".repeat(level)}- ${node.topic}`);
+                    if(node.children)
+                    {
+                        const nextLevel = level+1;
+                        for (let i = 0; i < node.children.length; i++) {
+                            logNode(node.children[i], nextLevel);
+                            
+                        }
+                    }
+                };
+                logNode(jm.mind.nodes.root);
+                document.getElementById("text").value = accumulator;
+                //console.log(jm.mind.nodes.root);
+            }
+            function convertMdToMap()
+            {
+
+            }
+            document.getElementById("mapToMd").onclick = convertMapToMd;
+            document.getElementById("mdToMap").onclick = ()=>{
+                load_jsmind(parse(document.getElementById("text").value));
+            };
+        </script>
+        
+
+    </body>
+</html>
