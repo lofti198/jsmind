@@ -70,11 +70,20 @@ var findType = function (line) {
               nodeStack.push(rootNode);
               lastLevelStack.push(1);
             } else {
+              //while has no rooting
+              if (nodes.length === 0) {
+                let defaultRoot = {
+                  id: "root",
+                  topic: '',
+                  isroot: true,
+                };
+                nodes.push(defaultRoot);
+                nodeStack.push(defaultRoot);
+                lastLevelStack.push(1);
+              }
               let lastNode = nodeStack[nodeStack.length - 1];
               let lastLevel = lastLevelStack[lastLevelStack.length - 1];
-  
               while (level <= lastLevel && nodeStack.length > 0) {
-                console.log(lastLevelStack);
                 lastLevelStack.pop();
                 lastLevel = lastLevelStack[lastLevelStack.length - 1];
                 nodeStack.pop();
@@ -98,6 +107,17 @@ var findType = function (line) {
           {
             var rel = findNodeTitle(line);
             if (rel) {
+              //while has no rooting
+              if (nodes.length === 0) {
+                let defaultRoot = {
+                  id: "root",
+                  topic: '',
+                  isroot: true,
+                };
+                nodes.push(defaultRoot);
+                nodeStack.push(defaultRoot);
+                lastLevelStack.push(1);
+              }
               let { title, level } = rel;
               let lastNode = nodeStack[nodeStack.length - 1];
               let lastLevel = lastLevelStack[lastLevelStack.length - 1];
